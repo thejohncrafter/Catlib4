@@ -139,8 +139,10 @@ instance (C D : Category ): HasIso (C ⥤ D) := inferInstanceAs (HasIso (functor
 
 end functor_category
 
+@[simp]
 theorem Functor.map_id {C D : Category} (F : Functor C D) (x : C) : F.map (𝟙 x) = 𝟙 (F.obj x) := map_id' F x
 
+@[simp]
 theorem Functor.map_comp {C D : Category} (F : Functor C D)
   : ∀ {x y z : C} (f : x ⟶ y) (g : y ⟶ z), F.map (f ≫ g) = F.map f ≫ F.map g
   := map_comp' F
@@ -150,6 +152,41 @@ def Functor.constant (C : Category) {D : Category} (a : D) : C ⥤ D where
   map _ := 𝟙 a
   map_id' _ := rfl
   map_comp' _ _ := (D.id_comp _).symm
+
+def Functor.comp' {B C D : Category} (F : Functor B C) (G : Functor C D) : Functor B D where
+  obj := G.obj ∘ F.obj
+  map := G.map ∘ F.map
+  map_id' x := by simp
+  map_comp' := by simp
+
+instance {B C D : Category} : HasComp' (Functor B C) (Functor C D) (Functor B D) where
+  comp' := Functor.comp'
+
+@[simp]
+theorem comp'_map {B C D : Category} (F : Functor B C) (G : Functor C D)
+  {x y : B} (f : x ⟶ y) : (F ⋙ G).map f = G.map (F.map f) := rfl
+
+section NaturalTransformations
+
+def NatTrans.hcomp {B C D : Category} {F₁ G₁ : B ⥤ C} {F₂ G₂ : C ⥤ D}
+  (σ : NatTrans F₁ G₁) (τ : NatTrans F₂ G₂) : NatTrans (F₁ ⋙ F₂) (G₁ ⋙ G₂)
+where
+  map x := τ.map (F₁.obj x) ≫ G₂.map (σ.map x)
+  naturality f := by
+    dsimp
+    rw [Category.assoc D]
+    rw [τ.naturality]
+    rw [← Category.assoc D]
+    rw [← G₂.map_comp]
+    rw [σ.naturality]
+    rw [G₂.map_comp]
+    rw [Category.assoc D]
+
+instance {B C D : Category} {F₁ G₁ : B ⥤ C} {F₂ G₂ : C ⥤ D}
+  : HasHComp (NatTrans F₁ G₁) (NatTrans F₂ G₂) (NatTrans (F₁ ⋙ F₂) (G₁ ⋙ G₂)) where
+  hcomp := NatTrans.hcomp
+
+end NaturalTransformations
 
 end Functor
 

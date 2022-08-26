@@ -34,6 +34,16 @@ section
 
 universe u v w
 
+class HasComp' (α : Type u) (β : Type v) (γ : outParam (Type w)) where
+  comp' : α → β → γ
+
+infixr:80 "⋙" => HasComp'.comp'
+
+class HasHComp (α : Type u) (β : Type v) (γ : outParam (Type w)) where
+  hcomp : α → β → γ
+
+infixr:80 "◫" => HasHComp.hcomp
+
 class HasCatProduct (α : Type u) (β : Type v) (γ : outParam (Type w)) where
   catProduct : α → β → γ
 
