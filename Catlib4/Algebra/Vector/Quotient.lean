@@ -66,10 +66,17 @@ def LinearMap.cokernel : VectorSpace K where
   zero_smul' := sorry
   one_smul' := sorry
 
-def cokernel_projector : LinearMap V f.cokernel where
+def LinearMap.cokernel_projector : LinearMap V f.cokernel where
   f := λ x => Quotient.mk _ x
   map_smul' _ _ := rfl
   map_add' _ _ := rfl
+
+theorem cokernel_vanish : LinearMap.compose f.cokernel_projector f = LinearMap.zero _ _ := by
+  apply LinearMap.ext
+  intro x
+  apply Quotient.sound
+  apply Exists.intro x
+  simp
 
 end
 
@@ -77,7 +84,8 @@ section
 
 variable {K : Field} {W V : VectorSpace K} {f : LinearMap W V}
 
-def cokernel_factor {E : VectorSpace K} (g : LinearMap V E) (h : ∀ x : W, g (f x) = 0) :
+def cokernel_factor {E : VectorSpace K} (g : LinearMap V E)
+  (h : LinearMap.compose g f = LinearMap.zero _ _) :
   LinearMap f.cokernel E where
   f := Quotient.lift g
     (by
@@ -87,7 +95,8 @@ def cokernel_factor {E : VectorSpace K} (g : LinearMap V E) (h : ∀ x : W, g (f
         rw [← V.zero_add x, ← V.add_neg x', ← V.add_assoc x']
         enter [2]
         rw [V.add_comm, p]
-      simp [h])
+      let p : g (f z) = 0 := congrFun (congrArg LinearMap.f h) z
+      simp [p, h])
   map_smul' μ := λ x => by
     induction x using Quotient.inductionOn with
     | h _ => exact g.map_smul _ _
@@ -95,10 +104,8 @@ def cokernel_factor {E : VectorSpace K} (g : LinearMap V E) (h : ∀ x : W, g (f
     induction x, y using Quotient.inductionOn₂ with
     | h _ _ => exact g.map_add _ _
 
-theorem factor {E : VectorSpace K} {g : LinearMap V E} {h : ∀ x : W, g (f x) = 0} :
-  g.f = λ x => cokernel_factor g h (cokernel_projector f x) := by rfl
+theorem factor_sound {E : VectorSpace K} {g : LinearMap V E}
+  {h : LinearMap.compose g f = LinearMap.zero _ _} :
+  g = LinearMap.compose (cokernel_factor g h) f.cokernel_projector := by rfl
 
 end
-
---def VectorSpace.cokernel {K : Field} {W V : VectorSpace K} (f : W → V) : VectorSpace K where
---  α := 

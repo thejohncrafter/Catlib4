@@ -57,7 +57,7 @@ variable {K : Field} (V : VectorSpace K)
 theorem VectorSpace.add_comm :
   ∀ x y : V, x + y = y + x := V.add_comm'
 
-@[simp] theorem VectorSpace.add_neg :
+@[simp↓] theorem VectorSpace.add_neg :
   ∀ x : V, x + -x = 0 := V.add_neg'
 
 @[simp] theorem VectorSpace.smul_smul :
@@ -84,6 +84,13 @@ theorem VectorSpace.add_comm :
 @[simp] theorem VectorSpace.add_mul_neg_one :
   ∀ x : V, x + (-1 : K) • x = 0 :=
   λ _ => neg_eq_neg_one_smul _ _ ▸ add_neg _ _
+
+@[simp] theorem VectorSpace.smul_add_neg_one_mul_smul :
+  ∀ x : V, ∀ μ : K, μ • x + ((-1) * μ) • x = 0 :=
+  λ _ _ => (smul_smul _ _ _ _) ▸ add_mul_neg_one _ _
+
+theorem VectorSpace.eq_of_sum_zero :
+  ∀ x y : V, x + -y = 0 → x = y := sorry
 
 end
 
@@ -122,6 +129,23 @@ variable (f : LinearMap V W)
   sorry
 
 end
+
+def LinearMap.zero {K : Field} (U V : VectorSpace K) : LinearMap U V where
+  f _ := 0
+  map_smul' := by simp
+  map_add' := by simp
+
+@[simp] theorem LinearMap.zero_val {K : Field} {U : VectorSpace K} (x : U) (V : VectorSpace K) :
+  LinearMap.zero U V x = 0 := rfl
+
+def LinearMap.compose {K : Field} {U V W : VectorSpace K}
+  (f : LinearMap V W) (g : LinearMap U V) : LinearMap U W where
+  f := f ∘ g
+  map_smul' := by simp
+  map_add' := by simp
+
+@[simp] theorem LinearMap.compose_val {K : Field} {U V W : VectorSpace K}
+  (f : LinearMap V W) (g : LinearMap U V) (x : U) : LinearMap.compose f g x = f (g x) := rfl
 
 def hom_space_struct {K : Field} (V W : VectorSpace K) : VectStructure K where
   α := LinearMap V W

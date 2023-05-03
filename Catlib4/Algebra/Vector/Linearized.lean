@@ -1,69 +1,10 @@
 
-import Catlib4.Groundwork.Finite
+import Catlib4.Algebra.Vector.FiniteSupport
 import Catlib4.Algebra.VectorSpace
 
 open Classical
 
 noncomputable section
-
-def support {α : Type} {A : Ring} (f : α → A) := { x : α // f x ≠ 0 }
-
-def finite_support (α : Type) (K : Field) := { f : α → K // finite (support f) }
-
-structure BilinearMap {K : Field} (U V W : VectorSpace K) where
-  f : U → V → W
-  map_smul_l : ∀ μ : K, ∀ u : U, ∀ v : V, f (μ • u) v = μ • f u v
-  map_smul_r : ∀ μ : K, ∀ u : U, ∀ v : V, f u (μ • v) = μ • f u v
-  map_add_l : ∀ v w : U, ∀ t : V, f (v + w) t = f v t + f w t
-  map_add_r : ∀ v : U, ∀ w t : V, f v (w + t) = f v w + f v t
-
-def map_supports {K : Field} {α : Type} (μ : K) (f : α → K) :
-  support (λ x => μ * f x) → support f :=
-  λ ⟨ x, q ⟩ => by
-    apply Subtype.mk x
-    by_cases h : μ = 0
-    exact False.elim <| q <| h ▸ K.zero_mul _
-    exact λ h' => q <| show μ * f x = 0 from h'.symm ▸ K.mul_zero _
-
-theorem map_supports_injective {K : Field} {α : Type} {μ : K} {f : α → K} :
-  injective (map_supports μ f) :=
-  λ _ _ h => Subtype.eq <| Subtype.noConfusion h id
-
---def map_supports' {K : Field} {α : Type} (μ : K) (f g : α → K) :
---  support (λ x => f x + g x) → support f ⊕ support g :=
---  λ ⟨ x, q ⟩ => by
---    sorry
-
-def List.sum {α : Type} {K : Field} {V : VectorSpace K} : List α → (α → V) → V
-  | [], _ => 0
-  | u :: t, f => f u + t.sum f
-
-theorem List.sum_perm {α : Type} {K : Field} {V : VectorSpace K} {f : α → V}
-  {l₁ l₂ : List α} (h : List.perm l₁ l₂) :
-  l₁.sum f = l₂.sum f := by
-  induction h with
-  | nil => rfl
-  | cons _ _ ih => simp [sum, ih]
-  | swap x y l => simp [sum, V.add_comm (f x) (f y)]
-  | trans h h' ih ih' => rw [ih, ih']
-
-def Multiset.sum {α : Type} {K : Field} {V : VectorSpace K} (f : α → V) : Multiset α → V :=
-  Quotient.lift (List.sum · f) <| by apply List.sum_perm
-
-def Finset.sum {α : Type} {K : Field} {V : VectorSpace K} (s : Finset α) (f : α → V) :
-  V := s.val.sum f
-
-def finite_sum {K : Field} {V : VectorSpace K} {α : Type} (h : finite α) (f : α → V) : V :=
-  (fintype_of_finite h).elems.sum f
-
-theorem finite_sum_val {α : Type} {K : Field} {V : VectorSpace K} {f : α → V}
-  {h : finite α} (fin : Fintype α) : finite_sum h f = fin.elems.sum f := by
-  simp only [finite_sum]
-  congr
-  apply fintype_singleton
-
-def finite_support.sum_support {α : Type} {K : Field} {V : VectorSpace K}
-  (f : finite_support α K) (g : α → V) := finite_sum f.2 (λ ⟨ x, _ ⟩ => f.1 x • g x)
 
 def linearized (K : Field) (α : Type) : VectorSpace K where
   α := finite_support α K
@@ -109,7 +50,7 @@ private def lem {α : Type} {x y : α} {A : Ring}
   (h : (if x = y then (1 : A) else (0 : A)) ≠ 0) : x = y :=
   if p : x = y then p else False.elim ∘ h <| by simp [p]
 
-def linearizeα {K : Field} {α : Type} (x : α) : finite_support α K :=
+def linearizeα {K : Field} {α : Type} (x : α) : linearized K α :=
   ⟨ λ y => if x = y then 1 else 0
   , by
     apply Exists.intro 1
@@ -118,7 +59,7 @@ def linearizeα {K : Field} {α : Type} (x : α) : finite_support α K :=
     apply Subtype.eq
     exact lem p ▸ lem q ▸ Eq.refl x ⟩
 
-#print List.Mem
+notation "l[" x "]" => linearizeα x
 
 theorem List.mem_of_eq_head {α : Type} {x y : α} {l : List α} (h : x = y) : x ∈ (y :: l) :=
   h ▸ Mem.head _
@@ -151,9 +92,54 @@ def linearizeF {K : Field} {α : Type} {V : VectorSpace K} (f : α → V) :
   map_smul' := sorry
   map_add' := sorry
 
-theorem linearize_val {K : Field} {α : Type} {V : VectorSpace K} {f : α → V} {x : α} :
-  (linearizeF f).f (linearizeα x) = f x := by
-  simp [linearizeF, linearizeα, finite_support.sum_support]
+@[simp] theorem linearize_val {K : Field} {α : Type} {V : VectorSpace K} {f : α → V} {x : α} :
+  (linearizeF f).f l[x] = f x := by
+  simp only [linearizeF, linearizeα, finite_support.sum_support]
   rw [finite_sum_val (linearizeα_support x)]
   show (if x = x then (1 : K) else (0 : K)) • f x + 0 = f x
   simp
+
+theorem finite_support_eq_finite_sum_pure {K : Field} {α : Type} (φ : linearized K α)
+  : φ = φ.sum_support λ x => l[x] := sorry
+
+theorem linearize.inductionOn {K : Field} {α : Type}
+  {motive : linearized K α → Prop}
+  (φ : linearized K α)
+  (pure : (x : α) → motive l[x])
+  (smul : (μ : K) → (x : linearized K α) → motive x → motive (μ • x))
+  (add : (x y : linearized K α) → motive x → motive y → motive (x + y))
+  (zero : motive 0)
+  : motive φ := by
+  rw [finite_support_eq_finite_sum_pure φ]
+  have ⟨ ⟨ val, nodup ⟩, complete ⟩ : Fintype (support φ.1) := fintype_of_finite φ.2
+  rw [finite_support.sum_support, finite_sum_val ⟨ ⟨ val, nodup ⟩, complete ⟩]
+  induction val using Quotient.inductionOn with
+  | h l =>
+    show motive (l.sum λ ⟨ x, _ ⟩ => φ.1 x • l[x])
+    clear complete nodup
+    induction l with
+    | nil => exact zero
+    | cons x t ih =>
+      apply add _ _ (smul _ _ <| pure _)
+      apply ih
+
+def linearizeF_map {α β : Type} {K : Field} {V W : VectorSpace K} (f : β → W) (g : α → β) :
+  linearizeF (f ∘ g) = LinearMap.compose (linearizeF f) (linearizeF (λ x => l[g x])) := by
+  apply LinearMap.ext
+  intro x
+  induction x using linearize.inductionOn with
+  | pure x => simp [LinearMap.compose]
+  | smul μ x ih => simp_all
+  | add x y ih ih' => simp_all
+  | zero => simp
+
+theorem factor_of_vanish {α : Type} {K : Field} {V W : VectorSpace K}
+  {f : α → V} {g : LinearMap V W}
+  (h : ∀ a : α, g (f a) = 0) : LinearMap.compose g (linearizeF f) = LinearMap.zero (linearized K α) W := by
+  apply LinearMap.ext
+  intro x
+  induction x using linearize.inductionOn with
+  | pure x => simp [h x]
+  | smul μ x ih => simp_all
+  | add x y ih ih' => simp_all
+  | zero => simp
