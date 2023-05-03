@@ -130,10 +130,18 @@ variable (f : LinearMap V W)
 
 end
 
+def LinearMap.identity {K : Field} (V : VectorSpace K) : LinearMap V V where
+  f x := x
+  map_smul' := by simp
+  map_add' := by simp
+
 def LinearMap.zero {K : Field} (U V : VectorSpace K) : LinearMap U V where
   f _ := 0
   map_smul' := by simp
   map_add' := by simp
+
+@[simp] theorem LinearMap.identity_val {K : Field} {U : VectorSpace K} (x : U) :
+  LinearMap.identity U x = x := rfl
 
 @[simp] theorem LinearMap.zero_val {K : Field} {U : VectorSpace K} (x : U) (V : VectorSpace K) :
   LinearMap.zero U V x = 0 := rfl

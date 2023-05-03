@@ -37,6 +37,26 @@ variable {K : Field} {U V W : VectorSpace K} (f : BilinearMap U V W)
 
 end
 
+theorem BilinearMap.eq {K : Field} {U V W : VectorSpace K} :
+  ∀ {f g : BilinearMap U V W}, f.f = g.f → f = g
+  | ⟨ _, _, _, _, _ ⟩, ⟨ _, _, _, _, _ ⟩, rfl => rfl
+
+theorem BilinearMap.ext {K : Field} {U V W : VectorSpace K}
+  {f g : BilinearMap U V W} (h : ∀ x y, f x y = g x y) : f = g :=
+  BilinearMap.eq <| funext λ x => funext λ y => h x y
+
+def BilinearMap.compose {K : Field} {U V W E : VectorSpace K}
+  (f : LinearMap W E) (g : BilinearMap U V W) : BilinearMap U V E where
+  f u v := f (g u v)
+  map_smul_l' := by simp
+  map_smul_r' := by simp
+  map_add_l' := by simp
+  map_add_r' := by simp
+
+@[simp] theorem BilinearMap.compose_val {K : Field} {U V W E : VectorSpace K}
+  (f : LinearMap W E) (g : BilinearMap U V W)
+  (u : U) (v : V) : BilinearMap.compose f g u v = f (g u v) := rfl
+
 def vanish_map_smul_l {K : Field} {U V : VectorSpace K} (u : U) (v : V) :
   LinearMap (linearized K K) (linearized K <| U × V) :=
   linearizeF λ μ => μ • l[(u, v)] + -l[(μ • u, v)]
@@ -183,29 +203,6 @@ def from_linearized_as_bilinear {K : Field} {U V W : VectorSpace K}
     simp [diagram_map, vanish_map_add_r]
     exact id -- weird proof pattern
 
-def tensorα {K : Field} (U V : VectorSpace K) : BilinearMap U V (tensor_space U V) :=
-  from_linearized_as_bilinear (diagram_map U V).cokernel_projector (cokernel_vanish _)
-
-def tensor_factor {K : Field} {U V W : VectorSpace K} (f : BilinearMap U V W) :
-  LinearMap (tensor_space U V) W :=
-  cokernel_factor (bilinear_as_from_linearized f) (factor_vanish_diagram f)
-
-theorem BilinearMap.eq {K : Field} {U V W : VectorSpace K} :
-  ∀ {f g : BilinearMap U V W}, f.f = g.f → f = g
-  | ⟨ _, _, _, _, _ ⟩, ⟨ _, _, _, _, _ ⟩, rfl => rfl
-
-theorem BilinearMap.ext {K : Field} {U V W : VectorSpace K}
-  {f g : BilinearMap U V W} (h : ∀ x y, f x y = g x y) : f = g :=
-  BilinearMap.eq <| funext λ x => funext λ y => h x y
-
-def BilinearMap.compose {K : Field} {U V W E : VectorSpace K}
-  (f : LinearMap W E) (g : BilinearMap U V W) : BilinearMap U V E where
-  f u v := f (g u v)
-  map_smul_l' := by simp
-  map_smul_r' := by simp
-  map_add_l' := by simp
-  map_add_r' := by simp
-
 theorem bilinear_as_from_linearized_eq {K : Field} {U V W : VectorSpace K}
   (f g : BilinearMap U V W)
   (h : bilinear_as_from_linearized f = bilinear_as_from_linearized g)
@@ -242,9 +239,41 @@ theorem linearize_bilinearize {K : Field} {U V W : VectorSpace K}
   | add x y hx hy => simp [hx, hy]
   | zero => simp
 
+def tensor_factor {K : Field} {U V W : VectorSpace K} (f : BilinearMap U V W) :
+  LinearMap (tensor_space U V) W :=
+  cokernel_factor (bilinear_as_from_linearized f) (factor_vanish_diagram f)
+
+def tensorα {K : Field} {U V : VectorSpace K} : BilinearMap U V (tensor_space U V) :=
+  from_linearized_as_bilinear (diagram_map U V).cokernel_projector (cokernel_vanish _)
+
 theorem tensor_factor_sound {K : Field} {U V W : VectorSpace K} (f : BilinearMap U V W) :
-  f = BilinearMap.compose (tensor_factor f) (tensorα U V) := by
+  f = BilinearMap.compose (tensor_factor f) tensorα := by
   let p := @factor_sound _ _ _ (diagram_map U V) _ (bilinear_as_from_linearized f) (factor_vanish_diagram f)
   apply bilinear_as_from_linearized_eq
   rw [p, tensor_factor, tensorα]
   rw [bilinear_as_from_linearized_map, linearize_bilinearize]
+
+@[simp] theorem tensor_factor_val {K : Field} {U V W : VectorSpace K} (f : BilinearMap U V W) :
+  ∀ {x y}, tensor_factor f (tensorα x y) = f x y := by
+  intro x y
+  conv => rhs; rw [tensor_factor_sound f]
+
+theorem map_tensor_ext {K : Field} {U V W : VectorSpace K}
+  {f g : LinearMap (tensor_space U V) W}
+  (h : BilinearMap.compose f tensorα = BilinearMap.compose g tensorα)
+  : f = g := by
+  apply eq_from_eq_compose_proj
+  apply LinearMap.ext
+  intro x
+  induction x using linearize.inductionOn with
+  | pure x =>
+    let (u, v) := x
+    let p := congrFun (congrFun (congrArg BilinearMap.f h) u) v
+    exact p
+  | smul μ x hx =>
+    simp only [LinearMap.map_smul]
+    rw [hx]
+  | add x y hx hy =>
+    simp only [LinearMap.map_add]
+    rw [hx, hy]
+  | zero => simp

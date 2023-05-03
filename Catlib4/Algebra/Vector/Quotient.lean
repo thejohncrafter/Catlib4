@@ -108,4 +108,14 @@ theorem factor_sound {E : VectorSpace K} {g : LinearMap V E}
   {h : LinearMap.compose g f = LinearMap.zero _ _} :
   g = LinearMap.compose (cokernel_factor g h) f.cokernel_projector := by rfl
 
+theorem eq_from_eq_compose_proj {E : VectorSpace K}
+  {g g' : LinearMap f.cokernel E}
+  (h : LinearMap.compose g f.cokernel_projector
+    = LinearMap.compose g' f.cokernel_projector)
+  : g = g' := by
+  apply LinearMap.ext
+  intro x
+  induction x using Quotient.inductionOn with
+  | h x => exact congrFun (congrArg LinearMap.f h) x
+
 end
