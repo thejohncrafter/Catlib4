@@ -40,51 +40,88 @@ structure VectorSpace (K : Field) extends VectStructure K where
 instance {K : Field} : CoeSort (VectorSpace K) (Type u) where
   coe V := V.α
 
-@[simp] theorem VectorSpace.add_zero {K : Field} (V : VectorSpace K) :
+section
+
+variable {K : Field} (V : VectorSpace K)
+
+@[simp] theorem VectorSpace.add_zero :
   ∀ x : V, x + 0 = x := V.add_zero'
 
-@[simp] theorem VectorSpace.zero_add {K : Field} (V : VectorSpace K) :
+@[simp] theorem VectorSpace.zero_add :
   ∀ x : V, 0 + x = x := V.zero_add'
 
-@[simp] theorem VectorSpace.add_assoc {K : Field} (V : VectorSpace K) :
+@[simp] theorem VectorSpace.add_assoc :
   ∀ x y z : V, x + (y + z) = x + y + z := V.add_assoc'
 
 -- Don't @[simp]: causes infinite loops!
-theorem VectorSpace.add_comm {K : Field} (V : VectorSpace K) :
+theorem VectorSpace.add_comm :
   ∀ x y : V, x + y = y + x := V.add_comm'
 
-@[simp] theorem VectorSpace.add_neg {K : Field} (V : VectorSpace K) :
+@[simp] theorem VectorSpace.add_neg :
   ∀ x : V, x + -x = 0 := V.add_neg'
 
-@[simp] theorem VectorSpace.smul_smul {K : Field} (V : VectorSpace K) :
+@[simp] theorem VectorSpace.smul_smul :
   ∀ x y : K, ∀ z : V, x • y • z = (x * y) • z := V.smul_smul'
 
-@[simp] theorem VectorSpace.smul_add {K : Field} (V : VectorSpace K) :
+@[simp] theorem VectorSpace.smul_add :
   ∀ x : K, ∀ y z : V, x • (y + z) = x • y + x • z := V.smul_add'
 
-@[simp] theorem VectorSpace.smul_zero {K : Field} (V : VectorSpace K) :
+@[simp] theorem VectorSpace.smul_zero :
   ∀ x : K, x • (0 : V) = 0 := V.smul_zero'
 
-@[simp] theorem VectorSpace.add_smul {K : Field} (V : VectorSpace K) :
+@[simp] theorem VectorSpace.add_smul :
   ∀ x y : K, ∀ z : V, (x + y) • z = x • z + y • z := V.add_smul'
 
-@[simp] theorem VectorSpace.zero_smul {K : Field} (V : VectorSpace K) :
+@[simp] theorem VectorSpace.zero_smul :
   ∀ x : V, (0 : K) • x = 0 := V.zero_smul'
 
-@[simp] theorem VectorSpace.one_smul {K : Field} (V : VectorSpace K) :
+@[simp] theorem VectorSpace.one_smul :
   ∀ x : V, (1 : K) • x = x := V.one_smul'
+
+@[simp] theorem VectorSpace.neg_eq_neg_one_smul : ∀ u : V, -u = -(1 : K) • u := by
+  sorry
+
+@[simp] theorem VectorSpace.add_mul_neg_one :
+  ∀ x : V, x + (-1 : K) • x = 0 :=
+  λ _ => neg_eq_neg_one_smul _ _ ▸ add_neg _ _
+
+end
 
 structure LinearMap {K : Field} (V W : VectorSpace K) where
   f : V → W
-  map_smul : ∀ μ : K, ∀ v : V, f (μ • v) = μ • f v
-  map_add : ∀ v w : V, f (v + w) = f v + f w
+  map_smul' : ∀ μ : K, ∀ v : V, f (μ • v) = μ • f v
+  map_add' : ∀ v w : V, f (v + w) = f v + f w
 
-theorem LinearMap.eq {K : Field} {V W : VectorSpace K} :
+section
+
+variable {K : Field} {V W : VectorSpace K}
+
+instance : CoeFun (LinearMap V W) (fun _ => V → W) where
+  coe f := f.f
+
+theorem LinearMap.eq :
   ∀ {f g : LinearMap V W}, f.f = g.f → f = g
   | ⟨ _, _, _ ⟩, ⟨ _, _, _ ⟩, rfl => rfl
 
-@[simp] theorem neg_eq_neg_one_smul {V : VectorSpace K} : ∀ u : V, -u = -(1 : K) • u := by
+theorem LinearMap.ext : ∀ {f g : LinearMap V W}, (∀ x, f x = g x) → f = g :=
+  LinearMap.eq ∘ funext
+
+variable (f : LinearMap V W)
+
+@[simp] theorem LinearMap.map_smul : ∀ μ : K, ∀ v : V, f (μ • v) = μ • f v := f.map_smul'
+
+@[simp] theorem LinearMap.map_add : ∀ v w : V, f (v + w) = f v + f w := f.map_add'
+
+@[simp] theorem LinearMap.map_zero : f 0 = 0 := by
   sorry
+
+@[simp] theorem LinearMap.map_neg : ∀ x, f (-x) = - f x := by
+  sorry
+
+@[simp] theorem LinearMap.map_neg_one_smul : ∀ x, f ((-1 : K) • x) = (-1 : K) • f x := by
+  sorry
+
+end
 
 def hom_space_struct {K : Field} (V W : VectorSpace K) : VectStructure K where
   α := LinearMap V W
@@ -109,35 +146,35 @@ def hom_space_struct {K : Field} (V W : VectorSpace K) : VectStructure K where
 def hom_space {K : Field} (V W : VectorSpace K) : VectorSpace K where
   toVectStructure := hom_space_struct V W
   add_zero' _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.add_zero _
   zero_add' _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.zero_add _
   add_assoc' _ _ _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.add_assoc _ _ _
   add_comm' _ _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.add_comm' _ _
   add_neg' _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.add_neg _
   smul_smul' _ _ _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.smul_smul' _ _ _
   smul_add' _ _ _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.smul_add _ _ _
   smul_zero' _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.smul_zero _
   add_smul' _ _ _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.add_smul _ _ _
   zero_smul' _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.zero_smul _
   one_smul' _ := by
-    apply LinearMap.eq ∘ funext
+    apply LinearMap.ext
     exact λ _ => W.one_smul _

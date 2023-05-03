@@ -41,7 +41,7 @@ structure Ring extends RingStructure where
   mul_one' : ∀ x : α, x * 1 = x
   one_mul' : ∀ x : α, 1 * x = x
   mul_assoc' : ∀ x y z : α, x * (y * z) = x * y * z
-  mul_distrib' : ∀ x y z : α, x * (y + z) = x * y + x * z
+  mul_add' : ∀ x y z : α, x * (y + z) = x * y + x * z
 
 instance : CoeSort Ring (Type u) where
   coe R := R.α
@@ -71,8 +71,28 @@ theorem Ring.add_comm (A : Ring) :
 @[simp] theorem Ring.mul_assoc (A : Ring) :
   ∀ x y z : A, x * (y * z) = x * y * z := A.mul_assoc'
 
-@[simp] theorem Ring.mul_distrib (A : Ring) :
-  ∀ x y z : A, x * (y + z) = x * y + x * z := A.mul_distrib'
+@[simp] theorem Ring.mul_add (A : Ring) :
+  ∀ x y z : A, x * (y + z) = x * y + x * z := A.mul_add'
+
+@[simp] theorem Ring.mul_zero (A : Ring) :
+  ∀ x : A, x * 0 = 0 := by
+  sorry
+
+@[simp] theorem Ring.add_mul (A : Ring) :
+  ∀ x y z : A, (x + y) * z = x * z + y * z := by
+  sorry
+
+@[simp] theorem Ring.zero_mul (A : Ring) :
+  ∀ x : A, 0 * x = 0 := by
+  sorry
+
+-- Don't @[simp]: causes infinite loops!
+theorem Ring.neg_eq_neg_one_mul (A : Ring) :
+  ∀ x : A, -x = -1 * x := by
+  sorry
+
+@[simp] theorem Ring.neg_one_mul_neg_one (A : Ring) : (-1 : A) * (-1 : A) = (1 : A) := by
+  sorry
 
 structure RingMorphism (A B : Ring) where
   φ : A → B
@@ -121,6 +141,7 @@ def Ring.compF {A B C : Ring}
 structure Field extends Ring, FieldStructure where
   inv_cancel' : ∀ x : α, (nz : x ≠ 0) → x * inv x nz = 1
   mul_comm' : ∀ x y : α, y * x = x * y
+  nonzero' : (1 : α) ≠ (0 : α)
 
 instance : CoeSort Field (Type u) where
   coe F := F.α
@@ -131,5 +152,7 @@ instance : CoeSort Field (Type u) where
 -- Don't @[simp]: causes infinite loops!
 theorem Field.mul_comm (F : Field) :
   ∀ x y : F, y * x = x * y := F.mul_comm'
+
+@[simp] theorem Field.nonzero (F : Field) : (1 : F) ≠ (0 : F) := F.nonzero'
 
 end Algebra
