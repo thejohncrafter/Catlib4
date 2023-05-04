@@ -6,7 +6,7 @@ universe u v
 class HasHom (α : Type u) : Sort (max u v + 1) where
   hom : α → α → Sort v
 
-infixr:10 "⟶" => HasHom.hom -- \h
+infixr:10 " ⟶ " => HasHom.hom -- \h
 
 class HasIdentity (α : Type u) [HasHom α] where
   identity : ∀ a : α, a ⟶ a

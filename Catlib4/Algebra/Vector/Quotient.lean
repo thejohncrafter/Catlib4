@@ -24,10 +24,8 @@ instance modulo_setoid : Setoid V where
   r := modulo f
   iseqv := modulo_equivalence f
 
-abbrev quotient_obj := Quotient (modulo_setoid f)
-
 def LinearMap.cokernel : VectorSpace K where
-  α := quotient_obj f
+  α := Quotient (modulo_setoid f)
   add := Quotient.lift₂
     (λ x y => Quotient.mk _ <| x + y)
     (by
@@ -117,5 +115,9 @@ theorem eq_from_eq_compose_proj {E : VectorSpace K}
   intro x
   induction x using Quotient.inductionOn with
   | h x => exact congrFun (congrArg LinearMap.f h) x
+
+attribute [irreducible] LinearMap.cokernel
+attribute [irreducible] LinearMap.cokernel_projector
+attribute [irreducible] cokernel_factor
 
 end
