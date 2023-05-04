@@ -99,9 +99,8 @@ theorem eq₃ {K : Field} {U V W E : VectorSpace K}
   (h : ∀ u v w, f (tensorα (tensorα u v) w) = g (tensorα (tensorα u v) w))
   : f = g := sorry
 
---set_option trace.Meta.isDefEq true in
---set_option trace.Meta.isDefEq.onFailure true in
---set_option maxHeartbeats 10000 in
+set_option trace.Meta.isDefEq true in
+set_option maxHeartbeats 10000 in
 def assoc (K : Field) :
   ((tensor_bifunctor K ×c Category.identity (KVect K)) ≫ tensor_bifunctor K) ⟶
     (Category.Product.assoc _ _ _
@@ -109,5 +108,5 @@ def assoc (K : Field) :
       ≫ tensor_bifunctor K) where
 map := λ ((U, V), W) => a U V W
 naturality := by
-  intro (U, V) (U', V') (f, g)
+  intro (U, V) (U', V') (f, g) -- Tries to unfold `LinearMap.cokernel`
   sorry
