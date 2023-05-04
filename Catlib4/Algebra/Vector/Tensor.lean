@@ -241,10 +241,12 @@ theorem linearize_bilinearize {K : Field} {U V W : VectorSpace K}
 
 def tensor_factor {K : Field} {U V W : VectorSpace K} (f : BilinearMap U V W) :
   LinearMap (tensor_space U V) W :=
-  cokernel_factor (bilinear_as_from_linearized f) (factor_vanish_diagram f)
+  (diagram_map U V).cokernel_factor
+    (bilinear_as_from_linearized f)
+    (factor_vanish_diagram f)
 
 def tensorα {K : Field} {U V : VectorSpace K} : BilinearMap U V (tensor_space U V) :=
-  from_linearized_as_bilinear (diagram_map U V).cokernel_projector (cokernel_vanish _)
+  from_linearized_as_bilinear (diagram_map U V).cokernel_projector cokernel_vanish
 
 theorem tensor_factor_sound {K : Field} {U V W : VectorSpace K} (f : BilinearMap U V W) :
   f = BilinearMap.compose (tensor_factor f) tensorα := by

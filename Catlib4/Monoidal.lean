@@ -9,7 +9,7 @@ universe u v
 
 structure MonoidalStructure : Type (max (u+1) (v+2)) where
   C : Category.{u,v+1}
-  M : C ×c C ⥤ C
+  M : C ×c C ⟶ C
   I : C
 
 instance : Coe MonoidalStructure Category where

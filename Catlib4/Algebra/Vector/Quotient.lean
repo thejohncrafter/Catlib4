@@ -1,6 +1,10 @@
 
 import Catlib4.Algebra.VectorSpace
 
+opaque opaque_id_wrapper {α : Type u} : { f : α → α // f = id } := ⟨ id, rfl ⟩
+def opaque_id {α : Type u} : α → α := opaque_id_wrapper.1
+theorem opaque_id_eq {α : Type u} : @opaque_id α = id := opaque_id_wrapper.2
+
 section
 
 variable {K : Field} {V W : VectorSpace K} (f : LinearMap W V)
@@ -24,7 +28,7 @@ instance modulo_setoid : Setoid V where
   r := modulo f
   iseqv := modulo_equivalence f
 
-def LinearMap.cokernel : VectorSpace K where
+def LinearMap.cokernel' : VectorSpace K where
   α := Quotient (modulo_setoid f)
   add := Quotient.lift₂
     (λ x y => Quotient.mk _ <| x + y)
@@ -64,27 +68,14 @@ def LinearMap.cokernel : VectorSpace K where
   zero_smul' := sorry
   one_smul' := sorry
 
-def LinearMap.cokernel_projector : LinearMap V f.cokernel where
+def LinearMap.cokernel_projector' : LinearMap V f.cokernel' where
   f := λ x => Quotient.mk _ x
   map_smul' _ _ := rfl
   map_add' _ _ := rfl
 
-theorem cokernel_vanish : LinearMap.compose f.cokernel_projector f = LinearMap.zero _ _ := by
-  apply LinearMap.ext
-  intro x
-  apply Quotient.sound
-  apply Exists.intro x
-  simp
-
-end
-
-section
-
-variable {K : Field} {W V : VectorSpace K} {f : LinearMap W V}
-
-def cokernel_factor {E : VectorSpace K} (g : LinearMap V E)
+def LinearMap.cokernel_factor' {E : VectorSpace K} (g : LinearMap V E)
   (h : LinearMap.compose g f = LinearMap.zero _ _) :
-  LinearMap f.cokernel E where
+  LinearMap f.cokernel' E where
   f := Quotient.lift g
     (by
       intro x x' ⟨ z, p ⟩
@@ -102,22 +93,80 @@ def cokernel_factor {E : VectorSpace K} (g : LinearMap V E)
     induction x, y using Quotient.inductionOn₂ with
     | h _ _ => exact g.map_add _ _
 
-theorem factor_sound {E : VectorSpace K} {g : LinearMap V E}
-  {h : LinearMap.compose g f = LinearMap.zero _ _} :
-  g = LinearMap.compose (cokernel_factor g h) f.cokernel_projector := by rfl
+/-
+opaque LinearMap.cokernel_wrapper : { x : VectorSpace K // x = f.cokernel } := ⟨ f.cokernel, rfl ⟩
+def LinearMap.cokernel' := f.cokernel_wrapper.1
+private theorem LinearMap.cokernel_eq : f.cokernel' = f.cokernel := f.cokernel_wrapper.2
 
-theorem eq_from_eq_compose_proj {E : VectorSpace K}
-  {g g' : LinearMap f.cokernel E}
-  (h : LinearMap.compose g f.cokernel_projector
-    = LinearMap.compose g' f.cokernel_projector)
+opaque LinearMap.cokernel_projector_wrapper :
+  { x : LinearMap V f.cokernel' // x = f.cokernel_eq ▸ f.cokernel_projector } := ⟨ f.cokernel_eq ▸ f.cokernel_projector, rfl ⟩
+def LinearMap.cokernel_projector' := f.cokernel_projector_wrapper.1
+private theorem LinearMap.cokernel_projector_eq :
+  f.cokernel_projector' = f.cokernel_eq ▸ f.cokernel_projector := f.cokernel_projector_wrapper.2
+
+opaque LinearMap.cokernel_factor_wrapper {E : VectorSpace K} (g : LinearMap V E) (h : LinearMap.compose g f = LinearMap.zero _ _) :
+  { x : LinearMap f.cokernel E // x = f.cokernel_factor g h } := ⟨ f.cokernel_factor g h, rfl ⟩
+def LinearMap.cokernel_factor' {E : VectorSpace K} (g : LinearMap V E) (h : LinearMap.compose g f = LinearMap.zero _ _) :=
+  (f.cokernel_factor_wrapper g h).1
+private theorem LinearMap.cokernel_factor_eq {E : VectorSpace K} (g : LinearMap V E) (h : LinearMap.compose g f = LinearMap.zero _ _) :
+  f.cokernel_factor' g h = f.cokernel_factor g h := (f.cokernel_factor_wrapper g h).2
+-/
+
+def LinearMap.cokernel := opaque_id f.cokernel'
+private theorem eq' : f.cokernel' = f.cokernel := by simp [LinearMap.cokernel, opaque_id_eq]
+def LinearMap.cokernel_projector : LinearMap V f.cokernel :=
+  (eq' f) ▸ opaque_id f.cokernel_projector'
+def LinearMap.cokernel_factor {E : VectorSpace K}
+  (g : LinearMap V E) (h : LinearMap.compose g f = LinearMap.zero _ _)
+  : LinearMap f.cokernel E :=
+  eq' f ▸ opaque_id (f.cokernel_factor' g h)
+
+#check LinearMap.cokernel_projector
+
+end
+
+section
+
+variable {K : Field} {W V : VectorSpace K} {f : LinearMap W V}
+
+theorem cokernel_vanish' : LinearMap.compose f.cokernel_projector' f = LinearMap.zero _ _ := by
+  apply LinearMap.ext
+  intro x
+  apply Quotient.sound
+  apply Exists.intro x
+  simp
+
+theorem factor_sound' {E : VectorSpace K} {g : LinearMap V E}
+  {h : LinearMap.compose g f = LinearMap.zero _ _} :
+  g = LinearMap.compose (f.cokernel_factor' g h) f.cokernel_projector' := by rfl
+
+theorem eq_from_eq_compose_proj' {E : VectorSpace K}
+  {g g' : LinearMap f.cokernel' E}
+  (h : LinearMap.compose g f.cokernel_projector'
+    = LinearMap.compose g' f.cokernel_projector')
   : g = g' := by
   apply LinearMap.ext
   intro x
   induction x using Quotient.inductionOn with
   | h x => exact congrFun (congrArg LinearMap.f h) x
 
-attribute [irreducible] LinearMap.cokernel
-attribute [irreducible] LinearMap.cokernel_projector
-attribute [irreducible] cokernel_factor
+theorem cokernel_vanish : LinearMap.compose f.cokernel_projector f = LinearMap.zero _ _ := by
+  rw [LinearMap.cokernel_projector, opaque_id_eq]
+  sorry -- find out how to rewrite that
+
+theorem factor_sound {E : VectorSpace K} {g : LinearMap V E}
+  {h : LinearMap.compose g f = LinearMap.zero _ _} :
+  g = LinearMap.compose (f.cokernel_factor g h) f.cokernel_projector := by
+  sorry -- find out how to rewrite that
+
+theorem eq_from_eq_compose_proj {E : VectorSpace K}
+  {g g' : LinearMap f.cokernel E}
+  (h : LinearMap.compose g f.cokernel_projector
+    = LinearMap.compose g' f.cokernel_projector)
+  : g = g' := sorry -- find out how to rewrite that
+
+--attribute [irreducible] LinearMap.cokernel
+--attribute [irreducible] LinearMap.cokernel_projector
+--attribute [irreducible] LinearMap.cokernel_factor
 
 end

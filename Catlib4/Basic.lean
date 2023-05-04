@@ -147,7 +147,7 @@ theorem Functor.map_comp {C D : Category} (F : Functor C D)
   : ∀ {x y z : C} (f : x ⟶ y) (g : y ⟶ z), F.map (f ≫ g) = F.map f ≫ F.map g
   := map_comp' F
 
-def Functor.constant (C : Category) {D : Category} (a : D) : C ⥤ D where
+def Functor.constant' (C : Category) {D : Category} (a : D) : C ⥤ D where
   obj _ := a
   map _ := 𝟙 a
   map_id' _ := rfl
@@ -157,7 +157,9 @@ def Functor.comp' {B C D : Category} (F : Functor B C) (G : Functor C D) : Funct
   obj := G.obj ∘ F.obj
   map := G.map ∘ F.map
   map_id' x := by simp
-  map_comp' := by simp
+  map_comp' f g := by
+    simp -- Work around bug
+    rw [F.map_comp, G.map_comp]
 
 instance {B C D : Category} : HasComp' (Functor B C) (Functor C D) (Functor B D) where
   comp' := Functor.comp'
