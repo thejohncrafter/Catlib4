@@ -108,5 +108,5 @@ def assoc (K : Field) :
       ≫ tensor_bifunctor K) where
 map := λ ((U, V), W) => a U V W
 naturality := by
-  intro (U, V) (U', V') (f, g) -- Tries to unfold `LinearMap.cokernel`
+  intro ((U, V), W) ((U', V'), W') ((f, g), h) -- Tries to unfold `LinearMap.cokernel`
   sorry
