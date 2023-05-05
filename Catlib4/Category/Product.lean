@@ -30,6 +30,12 @@ def assoc (A B C : Category) : ((A ×c B) ×c C) ⥤ (A ×c (B ×c C)) where
   map_id' := λ _ => rfl
   map_comp' := λ _ _ => rfl
 
+def assoc_inv (A B C : Category) : (A ×c (B ×c C)) ⟶ ((A ×c B) ×c C) where
+  obj := λ (a, b, c) => ((a, b), c)
+  map := λ (f, g, h) => ((f, g), h)
+  map_id' := λ _ => rfl
+  map_comp' := λ _ _ => rfl
+
 def symm (A B : Category) : (A ×c B) ⟶ (B ×c A) where
   obj := λ (a, b) => (b, a)
   map := λ (f, g) => (g, f)
