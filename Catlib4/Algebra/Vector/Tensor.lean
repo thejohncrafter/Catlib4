@@ -279,3 +279,8 @@ theorem map_tensor_ext {K : Field} {U V W : VectorSpace K}
     simp only [LinearMap.map_add]
     rw [hx, hy]
   | zero => simp
+
+theorem TensorMap.ext {K : Field} {U V W : VectorSpace K}
+  {f g : LinearMap (tensor_space U V) W}
+  (h : ∀ u v, f (tensorα u v) = g (tensorα u v)) : f = g :=
+  map_tensor_ext <| BilinearMap.ext h

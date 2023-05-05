@@ -113,6 +113,9 @@ theorem LinearMap.eq :
 theorem LinearMap.ext : ∀ {f g : LinearMap V W}, (∀ x, f x = g x) → f = g :=
   LinearMap.eq ∘ funext
 
+theorem LinearMap.congrFun : ∀ {f g : LinearMap V W}, f = g → ∀ x, f x = g x :=
+  λ h _ => h ▸ rfl
+
 variable (f : LinearMap V W)
 
 @[simp] theorem LinearMap.map_smul : ∀ μ : K, ∀ v : V, f (μ • v) = μ • f v := f.map_smul'

@@ -84,7 +84,7 @@ def LinearMap.cokernel_factor' {E : VectorSpace K} (g : LinearMap V E)
         rw [← V.zero_add x, ← V.add_neg x', ← V.add_assoc x']
         enter [2]
         rw [V.add_comm, p]
-      let p : g (f z) = 0 := congrFun (congrArg LinearMap.f h) z
+      let p : g (f z) = 0 := congrFun h z
       simp [p, h])
   map_smul' μ := λ x => by
     induction x using Quotient.inductionOn with
