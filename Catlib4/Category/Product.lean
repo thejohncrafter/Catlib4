@@ -24,7 +24,7 @@ instance {C D : Category.{u,v+1}} : HasHom (C.α × D.α) :=
 
 namespace Product
 
-def assoc (A B C : Category) : ((A ×c B) ×c C) ⥤ (A ×c (B ×c C)) where
+def assoc (A B C : Category) : ((A ×c B) ×c C) ⟶ (A ×c (B ×c C)) where
   obj := λ ((a, b), c) => (a, (b, c))
   map := λ ((f, g), h) => (f, (g, h))
   map_id' := λ _ => rfl
