@@ -213,3 +213,15 @@ def hom_space {K : Field} (V W : VectorSpace K) : VectorSpace K where
   one_smul' _ := by
     apply LinearMap.ext
     exact λ _ => W.one_smul _
+
+instance {K : Field} (V W : VectorSpace K) : Add (LinearMap V W)
+  := inferInstanceAs (Add (hom_space V W))
+instance {K : Field} (V W : VectorSpace K) : Neg (LinearMap V W)
+  := inferInstanceAs (Neg (hom_space V W))
+instance {K : Field} (V W : VectorSpace K) : SMul K (LinearMap V W)
+  := inferInstanceAs (SMul K (hom_space V W))
+instance {K : Field} (V W : VectorSpace K) : OfNat (LinearMap V W) (nat_lit 0)
+  := inferInstanceAs (OfNat (hom_space V W) (nat_lit 0))
+
+instance {K : Field} (V : VectorSpace K) : OfNat (LinearMap V V) (nat_lit 1) where
+  ofNat := LinearMap.identity V

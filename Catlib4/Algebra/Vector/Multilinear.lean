@@ -164,12 +164,6 @@ theorem prod_tensor_eq {K : Field} {W : VectorSpace K} {l : BinaryTree (VectorSp
     simp only [q]
     apply h
 
-instance {K : Field} (V W : VectorSpace K) : SMul K (LinearMap V W)
-  := inferInstanceAs (SMul K (hom_space V W))
-
-instance {K : Field} (V W : VectorSpace K) : Add (LinearMap V W)
-  := inferInstanceAs (Add (hom_space V W))
-
 def build_step_left {K : Field} {W V : VectorSpace K} {l : BinaryTree (VectorSpace K)}
   (f : prod_set (.node_left l V) → W)
   (map_smul : ∀ x : prod_set l, ∀ μ : K, ∀ v : V, f (x, μ • v) = μ • f (x, v))
