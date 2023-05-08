@@ -6,19 +6,19 @@ open Classical
 
 noncomputable section
 
-def fspace {K : Field} {α : Type} (Φ : α → VectorSpace K) := (a : α) → Φ a
+def fspace {K : Field} {α : Type} (Φ : α → KVect K) := (a : α) → Φ a
 
-def fsupport {K : Field} {α : Type} {Φ : α → VectorSpace K} (f : fspace Φ) :=
+def fsupport {K : Field} {α : Type} {Φ : α → KVect K} (f : fspace Φ) :=
   { x : α // f x ≠ 0 }
 
-def finite_fspace {K : Field} {α : Type} (Φ : α → VectorSpace K) :=
+def finite_fspace {K : Field} {α : Type} (Φ : α → KVect K) :=
   { f : fspace Φ // finite (fsupport f) }
 
-def finite_fspace.sum_support {K : Field} {α : Type} {Φ : α → VectorSpace K}
-  {V : VectorSpace K} (f : finite_fspace Φ) (g : (a : α) → LinearMap (Φ a) V) :=
+def finite_fspace.sum_support {K : Field} {α : Type} {Φ : α → KVect K}
+  {V : KVect K} (f : finite_fspace Φ) (g : (a : α) → Φ a ⟶ V) :=
   finite_sum f.2 λ ⟨ x, _ ⟩ => g x (f.1 x)
 
-def VectorSpace.product {K : Field} {α : Type} (Φ : α → VectorSpace K) : VectorSpace K where
+def KVect.product {K : Field} {α : Type} (Φ : α → KVect K) : KVect K where
   α := finite_fspace Φ
   add := λ ⟨ f, p ⟩ ⟨ g, q ⟩ =>
     ⟨ λ a => f a + g a
@@ -42,25 +42,24 @@ def VectorSpace.product {K : Field} {α : Type} (Φ : α → VectorSpace K) : Ve
   zero_smul := sorry
   one_smul := sorry
 
-def VectorSpace.map_product {K : Field} {α : Type} {Φ : α → VectorSpace K} {V : VectorSpace K}
-  (φ : (a : α) → LinearMap (Φ a) V) : LinearMap (product Φ) V where
+def KVect.map_product {K : Field} {α : Type} {Φ : α → KVect K} {V : KVect K}
+  (φ : (a : α) → Φ a ⟶ V) : product Φ ⟶ V where
   f f := f.sum_support φ
-  map_smul' := sorry
-  map_add' := sorry
+  map_smul := sorry
+  map_add := sorry
 
-theorem Product.factor_of_vanish {K : Field} {α : Type} {V W : VectorSpace K}
-  {Φ : α → VectorSpace K} (φ : (a : α) → LinearMap (Φ a) V) {g : LinearMap V W}
-  (h : ∀ a : α, LinearMap.compose g (φ a) = LinearMap.zero _ _) :
-  LinearMap.compose g (VectorSpace.map_product φ)
-    = LinearMap.zero (VectorSpace.product Φ) W := by
+theorem Product.factor_of_vanish {K : Field} {α : Type} {V W : KVect K}
+  {Φ : α → KVect K} (φ : (a : α) → Φ a ⟶ V) {g : V ⟶ W}
+  (h : ∀ a : α, φ a ≫ g = 0) :
+  KVect.map_product φ ≫ g = 0 := by
   sorry
 
-def Product.pure_elem {K : Field} {α : Type} (Φ : α → VectorSpace K)
-  (x : α) (v : Φ x) : VectorSpace.product Φ :=
+def Product.pure_elem {K : Field} {α : Type} (Φ : α → KVect K)
+  (x : α) (v : Φ x) : KVect.product Φ :=
   ⟨ λ y => if p : x = y then p ▸ v else 0
   , sorry ⟩
 
-def pure_elem_support_nz {K : Field} {α : Type} (Φ : α → VectorSpace K)
+def pure_elem_support_nz {K : Field} {α : Type} (Φ : α → KVect K)
   (x : α) (v : Φ x) (h : v ≠ 0) : Fintype (fsupport (Product.pure_elem Φ x v).1) where
   elems :=
     { val := Quotient.mk _ [⟨ x, by simp [Product.pure_elem, h] ⟩]
@@ -68,7 +67,7 @@ def pure_elem_support_nz {K : Field} {α : Type} (Φ : α → VectorSpace K)
   complete := by
     sorry
 
-def pure_elem_support {K : Field} {α : Type} (Φ : α → VectorSpace K)
+def pure_elem_support {K : Field} {α : Type} (Φ : α → KVect K)
   (x : α) (v : Φ x) : Fintype (fsupport (Product.pure_elem Φ x v).1) :=
   if p : v = 0 then
     { elems :=
@@ -79,13 +78,13 @@ def pure_elem_support {K : Field} {α : Type} (Φ : α → VectorSpace K)
   else pure_elem_support_nz Φ x v p
 
 @[simp]
-theorem map_pure_elem {K : Field} {α : Type} {Φ : α → VectorSpace K} {V : VectorSpace K}
-  (φ : (a : α) → LinearMap (Φ a) V) (x : α) (v : Φ x)
-  : VectorSpace.map_product φ (Product.pure_elem Φ x v) = φ x v := by
-  simp only [VectorSpace.map_product, Product.pure_elem, finite_fspace.sum_support]
+theorem map_pure_elem {K : Field} {α : Type} {Φ : α → KVect K} {V : KVect K}
+  (φ : (a : α) → Φ a ⟶ V) (x : α) (v : Φ x)
+  : KVect.map_product φ (Product.pure_elem Φ x v) = φ x v := by
+  simp only [KVect.map_product, Product.pure_elem, finite_fspace.sum_support]
   rw [finite_sum_val (pure_elem_support Φ x v)]
   sorry
 
---theorem map_product_zero_of_maps_zero {K : Field} {α : Type} {Φ : α → VectorSpace K} {V : VectorSpace K}
+--theorem map_product_zero_of_maps_zero {K : Field} {α : Type} {Φ : α → KVect K} {V : KVect K}
 --  {φ : (a : α) → LinearMap (Φ a) V}
 --  (h : ∀ a : α, )

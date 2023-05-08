@@ -6,7 +6,7 @@ open Classical
 
 noncomputable section
 
-def linearized (K : Field) (α : Type) : VectorSpace K where
+def linearized (K : Field) (α : Type) : KVect K where
   α := finite_support α K
   add := λ ⟨ f, p ⟩ ⟨ g, q ⟩ =>
     ⟨ λ x => f x + g x
@@ -86,13 +86,12 @@ def linearizeα_support {K : Field} (x : α) : Fintype (support (@linearizeα K 
     apply False.elim ∘ h
     simp [linearizeα, h']
 
-def linearizeF {K : Field} {α : Type} {V : VectorSpace K} (f : α → V) :
-  LinearMap (linearized K α) V where
+def linearizeF {K : Field} {α : Type} {V : KVect K} (f : α → V) : (linearized K α) ⟶ V where
   f φ := φ.sum_support f
-  map_smul' := sorry
-  map_add' := sorry
+  map_smul := sorry
+  map_add := sorry
 
-@[simp] theorem linearize_val {K : Field} {α : Type} {V : VectorSpace K} {f : α → V} {x : α} :
+@[simp] theorem linearize_val {K : Field} {α : Type} {V : KVect K} {f : α → V} {x : α} :
   (linearizeF f).f l[x] = f x := by
   simp only [linearizeF, linearizeα, finite_support.sum_support]
   rw [finite_sum_val (linearizeα_support x)]
@@ -123,8 +122,8 @@ theorem linearize.inductionOn {K : Field} {α : Type}
       apply add _ _ (smul _ _ <| pure _)
       apply ih
 
-def linearizeF_map {α β : Type} {K : Field} {V W : VectorSpace K} (f : β → W) (g : α → β) :
-  linearizeF (f ∘ g) = LinearMap.compose (linearizeF f) (linearizeF (λ x => l[g x])) := by
+def linearizeF_map {α β : Type} {K : Field} {V W : KVect K} (f : β → W) (g : α → β) :
+  linearizeF (f ∘ g) = (linearizeF (λ x => l[g x]) ≫ (linearizeF f)) := by
   apply LinearMap.ext
   intro x
   induction x using linearize.inductionOn with
@@ -133,9 +132,9 @@ def linearizeF_map {α β : Type} {K : Field} {V W : VectorSpace K} (f : β → 
   | add x y ih ih' => simp_all
   | zero => simp
 
-theorem factor_of_vanish {α : Type} {K : Field} {V W : VectorSpace K}
+theorem factor_of_vanish {α : Type} {K : Field} {V W : KVect K}
   {f : α → V} {g : LinearMap V W}
-  (h : ∀ a : α, g (f a) = 0) : LinearMap.compose g (linearizeF f) = LinearMap.zero (linearized K α) W := by
+  (h : ∀ a : α, g (f a) = 0) : (linearizeF f) ≫ g = (0 : (linearized K α) ⟶ W) := by
   apply LinearMap.ext
   intro x
   induction x using linearize.inductionOn with

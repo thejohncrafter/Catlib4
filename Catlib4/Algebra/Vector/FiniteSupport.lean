@@ -30,11 +30,11 @@ theorem map_supports_injective {K : Field} {α : Type} {μ : K} {f : α → K} :
 --  λ ⟨ x, q ⟩ => by
 --    sorry
 
-def List.sum {α : Type} {K : Field} {V : VectorSpace K} : List α → (α → V) → V
+def List.sum {α : Type} {K : Field} {V : KVect K} : List α → (α → V) → V
   | [], _ => 0
   | u :: t, f => f u + t.sum f
 
-theorem List.sum_perm {α : Type} {K : Field} {V : VectorSpace K} {f : α → V}
+theorem List.sum_perm {α : Type} {K : Field} {V : KVect K} {f : α → V}
   {l₁ l₂ : List α} (h : List.perm l₁ l₂) :
   l₁.sum f = l₂.sum f := by
   induction h with
@@ -43,20 +43,20 @@ theorem List.sum_perm {α : Type} {K : Field} {V : VectorSpace K} {f : α → V}
   | swap x y l => simp [sum, V.add_comm (f x) (f y)]
   | trans h h' ih ih' => rw [ih, ih']
 
-def Multiset.sum {α : Type} {K : Field} {V : VectorSpace K} (f : α → V) : Multiset α → V :=
+def Multiset.sum {α : Type} {K : Field} {V : KVect K} (f : α → V) : Multiset α → V :=
   Quotient.lift (List.sum · f) <| by apply List.sum_perm
 
-def Finset.sum {α : Type} {K : Field} {V : VectorSpace K} (s : Finset α) (f : α → V) :
+def Finset.sum {α : Type} {K : Field} {V : KVect K} (s : Finset α) (f : α → V) :
   V := s.val.sum f
 
-def finite_sum {K : Field} {V : VectorSpace K} {α : Type} (h : finite α) (f : α → V) : V :=
+def finite_sum {K : Field} {V : KVect K} {α : Type} (h : finite α) (f : α → V) : V :=
   (fintype_of_finite h).elems.sum f
 
-theorem finite_sum_val {α : Type} {K : Field} {V : VectorSpace K} {f : α → V}
+theorem finite_sum_val {α : Type} {K : Field} {V : KVect K} {f : α → V}
   {h : finite α} (fin : Fintype α) : finite_sum h f = fin.elems.sum f := by
   simp only [finite_sum]
   congr
   apply fintype_singleton
 
-def finite_support.sum_support {α : Type} {K : Field} {V : VectorSpace K}
+def finite_support.sum_support {α : Type} {K : Field} {V : KVect K}
   (f : finite_support α K) (g : α → V) := finite_sum f.2 (λ ⟨ x, _ ⟩ => f.1 x • g x)

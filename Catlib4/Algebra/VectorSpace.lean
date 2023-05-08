@@ -2,6 +2,8 @@
 import Catlib4.Algebra.Notation
 import Catlib4.Algebra.Ring
 
+import Catlib4.Category.Category
+
 structure VectStructure (K : Field) where
   α : Type u
   add : α → α → α
@@ -74,8 +76,8 @@ end
 
 structure LinearMap {K : Field} (V W : VectorSpace K) where
   f : V → W
-  map_smul' : ∀ μ : K, ∀ v : V, f (μ • v) = μ • f v
-  map_add' : ∀ v w : V, f (v + w) = f v + f w
+  map_smul : ∀ μ : K, ∀ v : V, f (μ • v) = μ • f v
+  map_add : ∀ v w : V, f (v + w) = f v + f w
 
 section
 
@@ -83,6 +85,9 @@ variable {K : Field} {V W : VectorSpace K}
 
 instance : CoeFun (LinearMap V W) (fun _ => V → W) where
   coe f := f.f
+
+attribute [simp] LinearMap.map_smul
+attribute [simp] LinearMap.map_add
 
 theorem LinearMap.eq :
   ∀ {f g : LinearMap V W}, f.f = g.f → f = g
@@ -95,10 +100,6 @@ theorem LinearMap.congrFun : ∀ {f g : LinearMap V W}, f = g → ∀ x, f x = g
   λ h _ => h ▸ rfl
 
 variable (f : LinearMap V W)
-
-@[simp] theorem LinearMap.map_smul : ∀ μ : K, ∀ v : V, f (μ • v) = μ • f v := f.map_smul'
-
-@[simp] theorem LinearMap.map_add : ∀ v w : V, f (v + w) = f v + f w := f.map_add'
 
 @[simp] theorem LinearMap.map_zero : f 0 = 0 := by
   sorry
@@ -113,31 +114,40 @@ end
 
 def LinearMap.identity {K : Field} (V : VectorSpace K) : LinearMap V V where
   f x := x
-  map_smul' := by simp
-  map_add' := by simp
+  map_smul := by simp
+  map_add := by simp
 
 def LinearMap.zero {K : Field} (U V : VectorSpace K) : LinearMap U V where
   f _ := 0
-  map_smul' := by simp
-  map_add' := by simp
-
-@[simp] theorem LinearMap.identity_val {K : Field} {U : VectorSpace K} (x : U) :
-  LinearMap.identity U x = x := rfl
-
-@[simp] theorem LinearMap.zero_val {K : Field} {U : VectorSpace K} (x : U) (V : VectorSpace K) :
-  LinearMap.zero U V x = 0 := rfl
+  map_smul := by simp
+  map_add := by simp
 
 def LinearMap.compose {K : Field} {U V W : VectorSpace K}
   (f : LinearMap V W) (g : LinearMap U V) : LinearMap U W where
   f := f ∘ g
-  map_smul' := by simp
-  map_add' := by simp
+  map_smul := by simp
+  map_add := by simp
 
-@[simp] theorem LinearMap.compose_val {K : Field} {U V W : VectorSpace K}
-  (f : LinearMap V W) (g : LinearMap U V) (x : U) : LinearMap.compose f g x = f (g x) := rfl
+def KVect (K : Field) : CategoryTheory.Category where
+  α := VectorSpace K
+  hom V W := LinearMap V W
+  id := LinearMap.identity
+  comp f g := LinearMap.compose g f
+  id_comp' := by intros; rfl
+  comp_id' := by intros; rfl
+  assoc' := by intros; rfl
 
-def hom_space_struct {K : Field} (V W : VectorSpace K) : VectStructure K where
-  α := LinearMap V W
+instance (K : Field) : HasHom (VectorSpace K) := inferInstanceAs (HasHom (KVect K))
+instance (K : Field) : HasIdentity (VectorSpace K) := inferInstanceAs (HasIdentity (KVect K))
+instance (K : Field) : HasComp (VectorSpace K) := inferInstanceAs (HasComp (KVect K))
+
+instance {K : Field} : CoeSort (KVect K) (Type u) := inferInstanceAs (CoeSort (VectorSpace K) (Type u))
+
+instance {K : Field} (V W : KVect K) : CoeFun (V ⟶ W) (fun _ => V → W) where
+  coe f := f.f
+
+def hom_space {K : Field} (V W : KVect K) : VectorSpace K where
+  α := V ⟶ W
   add := λ ⟨ f, p, q ⟩ ⟨ g, p', q' ⟩ =>
     ⟨ λ x => f x + g x
     , by simp [p, q, p', q']
@@ -155,9 +165,6 @@ def hom_space_struct {K : Field} (V W : VectorSpace K) : VectStructure K where
     ⟨ λ x => μ • f x
     , by intro ν v; simp [p, q, K.mul_comm μ ν]
     , by simp [p, q] ⟩
-
-def hom_space {K : Field} (V W : VectorSpace K) : VectorSpace K where
-  toVectStructure := hom_space_struct V W
   add_zero _ := by
     apply LinearMap.ext
     exact λ _ => W.add_zero _
@@ -192,14 +199,23 @@ def hom_space {K : Field} (V W : VectorSpace K) : VectorSpace K where
     apply LinearMap.ext
     exact λ _ => W.one_smul _
 
-instance {K : Field} (V W : VectorSpace K) : Add (LinearMap V W)
+instance {K : Field} (V W : KVect K) : Add (V ⟶ W)
   := inferInstanceAs (Add (hom_space V W))
-instance {K : Field} (V W : VectorSpace K) : Neg (LinearMap V W)
+instance {K : Field} (V W : KVect K) : Neg (V ⟶ W)
   := inferInstanceAs (Neg (hom_space V W))
-instance {K : Field} (V W : VectorSpace K) : SMul K (LinearMap V W)
+instance {K : Field} (V W : KVect K) : SMul K (V ⟶ W)
   := inferInstanceAs (SMul K (hom_space V W))
-instance {K : Field} (V W : VectorSpace K) : OfNat (LinearMap V W) (nat_lit 0)
+instance {K : Field} (V W : KVect K) : OfNat (V ⟶ W) (nat_lit 0)
   := inferInstanceAs (OfNat (hom_space V W) (nat_lit 0))
 
-instance {K : Field} (V : VectorSpace K) : OfNat (LinearMap V V) (nat_lit 1) where
+instance {K : Field} (V : KVect K) : OfNat (V ⟶ V) (nat_lit 1) where
   ofNat := LinearMap.identity V
+
+@[simp] theorem LinearMap.identity_val {K : Field} {U : KVect K} (x : U) :
+  𝟙 U x = x := rfl
+
+@[simp] theorem LinearMap.zero_val {K : Field} {U : KVect K} (x : U) (V : KVect K) :
+  (0 : U ⟶ V) x = 0 := rfl
+
+@[simp] theorem LinearMap.compose_val {K : Field} {U V W : KVect K}
+  (f : V ⟶ W) (g : U ⟶ V) (x : U) : (g ≫ f) x = f (g x) := rfl
