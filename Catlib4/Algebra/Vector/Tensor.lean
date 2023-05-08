@@ -284,3 +284,5 @@ theorem TensorMap.ext {K : Field} {U V W : VectorSpace K}
   {f g : LinearMap (tensor_space U V) W}
   (h : ∀ u v, f (tensorα u v) = g (tensorα u v)) : f = g :=
   map_tensor_ext <| BilinearMap.ext h
+
+attribute [irreducible] tensor_space

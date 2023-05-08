@@ -1,0 +1,133 @@
+[0/1] Building Catlib4.mwe
+error: > LEAN_PATH=./build/lib LD_LIBRARY_PATH=./build/lib /home/thejohncrafter/.elan/toolchains/leanprover--lean4---nightly-2023-04-20/bin/lean ./././Catlib4/mwe.lean -R ././. -o ./build/lib/Catlib4/mwe.olean -i ./build/lib/Catlib4/mwe.ilean -c ./build/ir/Catlib4/mwe.c
+error: stdout:
+./././Catlib4/mwe.lean:69:46: error: application type mismatch
+  Prod.mk f
+argument
+  f
+has type
+  a ⟶ a' : Type ?u.25348
+but is expected to have type
+  ?m.25356.fst ⟶ ?m.25357.fst : Type ?u.25348
+./././Catlib4/mwe.lean:69:30: error: type mismatch
+  (g, f)
+has type
+  (b ⟶ b') × (a ⟶ a') : Type (max ?u.25346 ?u.25348)
+but is expected to have type
+  Prefunctor.obj (symm A B) ?m.25356 ⟶ Prefunctor.obj (symm A B) ?m.25357 : Type (max ?u.25346 ?u.25348)
+./././Catlib4/mwe.lean:137:22: error: maximum recursion depth has been reached (use `set_option maxRecDepth <num>` to increase limit)
+./././Catlib4/mwe.lean:137:25: error: maximum recursion depth has been reached (use `set_option maxRecDepth <num>` to increase limit)
+./././Catlib4/mwe.lean:298:0: error: application type mismatch
+  map✝ = map
+argument has type
+  {x y : Q.α} → (x ⟶ y) → (obj x ⟶ obj y)
+but function has type
+  ({x y : Q.α} → (x ⟶ y) → (obj✝ x ⟶ obj✝ y)) → Prop
+./././Catlib4/mwe.lean:343:31: error: type mismatch
+  rfl
+has type
+  add 0 1 = add 0 1 : Prop
+but is expected to have type
+  add 0 1 = add 0 2 : Prop
+./././Catlib4/mwe.lean:403:2: error: don't know how to synthesize implicit argument
+  @Prefunctor.map ((Q⊗R)⊗S) (Q⊗R⊗S) (assoc Q R S) (?m.54388 f g h) (?m.54389 f g h) ((f, g), h)
+context:
+Q : Quiver
+R : Quiver
+S : Quiver
+a a' : Q.α
+b b' : R.α
+c c' : S.α
+f : a ⟶ a'
+g : b ⟶ b'
+h : c ⟶ c'
+⊢ ((Q⊗R)⊗S).α
+when the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed
+./././Catlib4/mwe.lean:403:21: error: don't know how to synthesize implicit argument
+  @Prod.mk ((?m.54388 f g h).fst.fst ⟶ (?m.54389 f g h).fst.fst) ((?m.54388 f g h).fst.snd ⟶ (?m.54389 f g h).fst.snd) f
+    g
+context:
+Q : Quiver
+R : Quiver
+S : Quiver
+a a' : Q.α
+b b' : R.α
+c c' : S.α
+f : a ⟶ a'
+g : b ⟶ b'
+h : c ⟶ c'
+⊢ Type ?u.53876
+when the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed
+./././Catlib4/mwe.lean:403:2: error: don't know how to synthesize implicit argument
+  @Prefunctor.map ((Q⊗R)⊗S) (Q⊗R⊗S) (assoc Q R S) (?m.54388 f g h) (?m.54389 f g h) ((f, g), h)
+context:
+Q : Quiver
+R : Quiver
+S : Quiver
+a a' : Q.α
+b b' : R.α
+c c' : S.α
+f : a ⟶ a'
+g : b ⟶ b'
+h : c ⟶ c'
+⊢ ((Q⊗R)⊗S).α
+when the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed
+./././Catlib4/mwe.lean:403:20: error: don't know how to synthesize implicit argument
+  @Prod.mk ((?m.54388 f g h).fst ⟶ (?m.54389 f g h).fst) ((?m.54388 f g h).snd ⟶ (?m.54389 f g h).snd) (f, g) h
+context:
+Q : Quiver
+R : Quiver
+S : Quiver
+a a' : Q.α
+b b' : R.α
+c c' : S.α
+f : a ⟶ a'
+g : b ⟶ b'
+h : c ⟶ c'
+⊢ Type (max ?u.53874 ?u.53876)
+when the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed
+./././Catlib4/mwe.lean:403:21: error: don't know how to synthesize implicit argument
+  @Prod.mk ((?m.54388 f g h).fst.fst ⟶ (?m.54389 f g h).fst.fst) ((?m.54388 f g h).fst.snd ⟶ (?m.54389 f g h).fst.snd) f
+    g
+context:
+Q : Quiver
+R : Quiver
+S : Quiver
+a a' : Q.α
+b b' : R.α
+c c' : S.α
+f : a ⟶ a'
+g : b ⟶ b'
+h : c ⟶ c'
+⊢ Type ?u.53874
+when the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed
+./././Catlib4/mwe.lean:403:2: error: don't know how to synthesize implicit argument
+  @Eq (Prefunctor.obj (assoc Q R S) (?m.54388 f g h) ⟶ Prefunctor.obj (assoc Q R S) (?m.54389 f g h))
+    (Prefunctor.map (assoc Q R S) ((f, g), h)) (f, g, h)
+context:
+Q : Quiver
+R : Quiver
+S : Quiver
+a a' : Q.α
+b b' : R.α
+c c' : S.α
+f : a ⟶ a'
+g : b ⟶ b'
+h : c ⟶ c'
+⊢ Type (max (max ?u.53872 ?u.53874) ?u.53876)
+when the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed
+./././Catlib4/mwe.lean:403:20: error: don't know how to synthesize implicit argument
+  @Prod.mk ((?m.54388 f g h).fst ⟶ (?m.54389 f g h).fst) ((?m.54388 f g h).snd ⟶ (?m.54389 f g h).snd) (f, g) h
+context:
+Q : Quiver
+R : Quiver
+S : Quiver
+a a' : Q.α
+b b' : R.α
+c c' : S.α
+f : a ⟶ a'
+g : b ⟶ b'
+h : c ⟶ c'
+⊢ Type ?u.53872
+when the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed
+error: external command `/home/thejohncrafter/.elan/toolchains/leanprover--lean4---nightly-2023-04-20/bin/lean` exited with code 1

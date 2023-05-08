@@ -128,7 +128,7 @@ def linear_leaf {K : Field} {U V : VectorSpace K} (f : U → V) (h : Multilinear
   map_smul' := by cases h with | one _ map_smul map_add => exact map_smul
   map_add' := by cases h with | one _ map_smul map_add => exact map_add
 
-theorem prod_tensor_eq {K : Field} {W : VectorSpace K} {l : BinaryTree (VectorSpace K)}
+theorem prod_tensor_eq {K : Field} {W : VectorSpace K} (l : BinaryTree (VectorSpace K))
   (f g : LinearMap (prod_tensor l) W)
   (h : ∀ x : prod_set l, f (prod_tensorα x) = g (prod_tensorα x)) : f = g := by
   induction l with

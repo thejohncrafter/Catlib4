@@ -37,8 +37,24 @@ instance (C D : Category) : HasIso (C ⟶ D) := inferInstanceAs (HasIso (C ⥤ D
 
 def identity (C : Category) : C ⟶ C := identity' C
 
+@[simp] theorem identity_obj {C : Category} (c : C) :
+  (identity C).obj c = c := rfl
+
+@[simp] theorem identity_map {C : Category} {c d : C} (f : c ⟶ d) :
+  (identity C).map f = f := rfl
+
 end Category
 
 def Functor.constant (C : Category) {D : Category} (a : D) : C ⟶ D := Functor.constant' C a
+
+@[simp] theorem Functor.comp_obj {A B C : Category}
+  (F : A ⟶ B) (G : B ⟶ C) (x : A) : (F ≫ G).obj x = G.obj (F.obj x) := rfl
+
+@[simp] theorem Functor.comp_map {A B C : Category}
+  {a a' : A} (F : A ⟶ B) (G : B ⟶ C)
+  (f : a ⟶ a') : (F ≫ G).map f = G.map (F.map f) := rfl
+
+@[simp] theorem Functor.constant_obj (C : Category) {D : Category} (a : D) :
+  ∀ x : C, (Functor.constant C a).obj x = a := λ _ => rfl
 
 end CategoryTheory
