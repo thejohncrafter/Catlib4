@@ -34,17 +34,17 @@ def linearized (K : Field) (α : Type) : VectorSpace K where
       apply Exists.intro n
       apply Exists.intro (φ ∘ map_supports μ f)
       exact comp_injective p map_supports_injective ⟩
-  add_zero' _ := Subtype.eq ∘ funext <| λ _ => K.add_zero _
-  zero_add' _ := Subtype.eq ∘ funext <| λ _ => K.zero_add _
-  add_assoc' _ _ _ := Subtype.eq ∘ funext <| λ _ => K.add_assoc _ _ _
-  add_comm' _ _ := Subtype.eq ∘ funext <| λ _ => K.add_comm _ _
-  add_neg' _ := Subtype.eq ∘ funext <| λ _ => K.add_neg _
-  smul_smul' _ _ _ := Subtype.eq ∘ funext <| λ _ => K.mul_assoc _ _ _
-  smul_add' _ _ _ := Subtype.eq ∘ funext <| λ _ => K.mul_add _ _ _
-  smul_zero' _ := Subtype.eq ∘ funext <| λ _ => K.mul_zero _
-  add_smul' _ _ _ := Subtype.eq ∘ funext <| λ _ => K.add_mul _ _ _
-  zero_smul' _ := Subtype.eq ∘ funext <| λ _ => K.zero_mul _
-  one_smul' _ := Subtype.eq ∘ funext <| λ _ => K.one_mul _
+  add_zero _ := Subtype.eq ∘ funext <| λ _ => K.add_zero _
+  zero_add _ := Subtype.eq ∘ funext <| λ _ => K.zero_add _
+  add_assoc _ _ _ := Subtype.eq ∘ funext <| λ _ => K.add_assoc _ _ _
+  add_comm _ _ := Subtype.eq ∘ funext <| λ _ => K.add_comm _ _
+  add_neg _ := Subtype.eq ∘ funext <| λ _ => K.add_neg _
+  smul_smul _ _ _ := Subtype.eq ∘ funext <| λ _ => K.mul_assoc _ _ _
+  smul_add _ _ _ := Subtype.eq ∘ funext <| λ _ => K.mul_add _ _ _
+  smul_zero _ := Subtype.eq ∘ funext <| λ _ => K.mul_zero _
+  add_smul _ _ _ := Subtype.eq ∘ funext <| λ _ => K.add_mul _ _ _
+  zero_smul _ := Subtype.eq ∘ funext <| λ _ => K.zero_mul _
+  one_smul _ := Subtype.eq ∘ funext <| λ _ => K.one_mul _
 
 private def lem {α : Type} {x y : α} {A : Ring}
   (h : (if x = y then (1 : A) else (0 : A)) ≠ 0) : x = y :=

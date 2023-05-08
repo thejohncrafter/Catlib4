@@ -52,17 +52,17 @@ def LinearMap.cokernel' : VectorSpace K where
       apply Quotient.sound
       apply Exists.intro (μ • z)
       simp [← h, K.mul_comm μ])
-  add_zero' := sorry
-  zero_add' := sorry
-  add_assoc' := sorry
-  add_comm' := sorry
-  add_neg' := sorry
-  smul_smul' := sorry
-  smul_add' := sorry
-  smul_zero' := sorry
-  add_smul' := sorry
-  zero_smul' := sorry
-  one_smul' := sorry
+  add_zero := sorry
+  zero_add := sorry
+  add_assoc := sorry
+  add_comm := sorry
+  add_neg := sorry
+  smul_smul := sorry
+  smul_add := sorry
+  smul_zero := sorry
+  add_smul := sorry
+  zero_smul := sorry
+  one_smul := sorry
 
 def LinearMap.cokernel_projector' : LinearMap V f.cokernel' where
   f := λ x => Quotient.mk _ x

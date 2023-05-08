@@ -30,17 +30,17 @@ def VectorSpace.product {K : Field} {α : Type} (Φ : α → VectorSpace K) : Ve
   smul μ := λ ⟨ f, p ⟩ =>
     ⟨ λ a => μ • f a
     , sorry ⟩
-  add_zero' := sorry
-  zero_add' := sorry
-  add_assoc' := sorry
-  add_comm' := sorry
-  add_neg' := sorry
-  smul_smul' := sorry
-  smul_add' := sorry
-  smul_zero' := sorry
-  add_smul' := sorry
-  zero_smul' := sorry
-  one_smul' := sorry
+  add_zero := sorry
+  zero_add := sorry
+  add_assoc := sorry
+  add_comm := sorry
+  add_neg := sorry
+  smul_smul := sorry
+  smul_add := sorry
+  smul_zero := sorry
+  add_smul := sorry
+  zero_smul := sorry
+  one_smul := sorry
 
 def VectorSpace.map_product {K : Field} {α : Type} {Φ : α → VectorSpace K} {V : VectorSpace K}
   (φ : (a : α) → LinearMap (Φ a) V) : LinearMap (product Φ) V where

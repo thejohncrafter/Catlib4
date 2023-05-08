@@ -33,46 +33,28 @@ structure FieldStructure extends RingStructure where
   inv : (x : α) → x ≠ 0 → α
 
 structure Ring extends RingStructure where
-  add_zero' : ∀ x : α, x + 0 = x
-  zero_add' : ∀ x : α, 0 + x = x
-  add_assoc' : ∀ x y z : α, x + (y + z) = x + y + z
-  add_comm' : ∀ x y : α, x + y = y + x
-  add_neg' : ∀ x : α, x + -x = 0
-  mul_one' : ∀ x : α, x * 1 = x
-  one_mul' : ∀ x : α, 1 * x = x
-  mul_assoc' : ∀ x y z : α, x * (y * z) = x * y * z
-  mul_add' : ∀ x y z : α, x * (y + z) = x * y + x * z
+  add_zero : ∀ x : α, x + 0 = x
+  zero_add : ∀ x : α, 0 + x = x
+  add_assoc : ∀ x y z : α, x + (y + z) = x + y + z
+  add_comm : ∀ x y : α, x + y = y + x
+  add_neg : ∀ x : α, x + -x = 0
+  mul_one : ∀ x : α, x * 1 = x
+  one_mul : ∀ x : α, 1 * x = x
+  mul_assoc : ∀ x y z : α, x * (y * z) = x * y * z
+  mul_add : ∀ x y z : α, x * (y + z) = x * y + x * z
 
 instance : CoeSort Ring (Type u) where
   coe R := R.α
 
-@[simp] theorem Ring.add_zero (A : Ring) :
-  ∀ x : A, x + 0 = x := A.add_zero'
-
-@[simp] theorem Ring.zero_add (A : Ring) :
-  ∀ x : A, 0 + x = x := A.zero_add'
-
-@[simp] theorem Ring.add_assoc (A : Ring) :
-  ∀ x y z : A, x + (y + z) = x + y + z := A.add_assoc'
-
--- Don't @[simp]: causes infinite loops!
-theorem Ring.add_comm (A : Ring) :
-  ∀ x y : A, x + y = y + x := A.add_comm'
-
-@[simp] theorem Ring.add_neg (A : Ring) :
-  ∀ x : A, x + -x = 0 := A.add_neg'
-
-@[simp] theorem Ring.mul_one (A : Ring) :
-  ∀ x : A, x * 1 = x := A.mul_one'
-
-@[simp] theorem Ring.one_mul (A : Ring) :
-  ∀ x : A, 1 * x = x := A.one_mul'
-
-@[simp] theorem Ring.mul_assoc (A : Ring) :
-  ∀ x y z : A, x * (y * z) = x * y * z := A.mul_assoc'
-
-@[simp] theorem Ring.mul_add (A : Ring) :
-  ∀ x y z : A, x * (y + z) = x * y + x * z := A.mul_add'
+attribute [simp] Ring.add_zero
+attribute [simp] Ring.zero_add
+attribute [simp] Ring.add_assoc
+-- attribute [simp] Ring.add_com -- Don't @[simp]: causes infinite loops!
+attribute [simp↓] Ring.add_neg
+attribute [simp] Ring.mul_one
+attribute [simp] Ring.one_mul
+attribute [simp] Ring.mul_assoc
+attribute [simp] Ring.mul_add
 
 @[simp] theorem Ring.mul_zero (A : Ring) :
   ∀ x : A, x * 0 = 0 := by

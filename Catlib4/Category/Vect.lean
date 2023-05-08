@@ -71,17 +71,17 @@ def tensor_unit (K : Field) : VectorSpace K where
   neg := K.neg
   zero := K.zero
   smul := K.mul
-  add_zero' := K.add_zero
-  zero_add' := K.zero_add
-  add_assoc' := K.add_assoc
-  add_comm' := K.add_comm
-  add_neg' := K.add_neg
-  smul_smul' := K.mul_assoc
-  smul_add' := K.mul_add
-  smul_zero' := K.mul_zero
-  add_smul' := K.add_mul
-  zero_smul' := K.zero_mul
-  one_smul' := K.one_mul
+  add_zero := K.add_zero
+  zero_add := K.zero_add
+  add_assoc := K.add_assoc
+  add_comm := K.add_comm
+  add_neg := K.add_neg
+  smul_smul := K.mul_assoc
+  smul_add := K.mul_add
+  smul_zero := K.mul_zero
+  add_smul := K.add_mul
+  zero_smul := K.zero_mul
+  one_smul := K.one_mul
 
 theorem eq₃ {K : Field} {U V W E : VectorSpace K}
   (f g : LinearMap (tensor_space (tensor_space U V) W) E)
