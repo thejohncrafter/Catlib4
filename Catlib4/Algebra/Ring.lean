@@ -3,7 +3,7 @@ import Catlib4.Algebra.Notation
 
 section Algebra
 
-structure RingStructure : Type (u+1) where
+structure RingStructure where
   α : Type u
   add : α → α → α
   neg : α → α

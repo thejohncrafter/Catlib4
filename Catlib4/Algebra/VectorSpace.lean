@@ -1,5 +1,4 @@
 
-import Catlib4.Algebra.Notation
 import Catlib4.Algebra.Ring
 
 import Catlib4.Category.Category
